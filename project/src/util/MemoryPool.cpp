@@ -34,10 +34,12 @@ MemoryPool::MemoryPool(USHORT _nUnitSize, USHORT _nInitSize, USHORT _nGrowSize)
 
 void * MemoryPool::Alloc()
 {
+    bool first = false;
 	if (!pBlock)	// 1
 	{// pBlock is NULL, So we need new an newly MemoryBlock
 		/* code */
 		pBlock = new(nInitSize, nUnitSize)MemoryBlock(nInitSize,nUnitSize);
+        first = true;
 	}
 
 	// Find an MemoryBlock that has empty space!
@@ -46,12 +48,23 @@ void * MemoryPool::Alloc()
 		pMyBlock = pMyBlock->pNext;
 
 	if (pMyBlock) // 3
-	{	// Return the address from finded memoryblock
-		char * pFree = pMyBlock->aData+(pMyBlock->nFirst*nUnitSize);
-		pMyBlock->nFirst = *((USHORT*)pFree);
+	{	// Return the address from finded MemoryBlock
+        if (first)
+        {
+            char * pFree = pMyBlock->aData;
+            pMyBlock->nFirst = 1;
 
-		pMyBlock->nFree--;
-		return (void*)pFree;
+            return (void*)pFree;
+        }
+        else
+        {
+            char * pFree = pMyBlock->aData+(pMyBlock->nFirst*nUnitSize);
+            pMyBlock->nFirst = *((USHORT*)pFree);
+
+            pMyBlock->nFree--;
+            return (void*)pFree;
+            
+        }
 	}
 	else	// 4
 	{	// All MemoryBlock is Full!!
@@ -77,7 +90,8 @@ void * MemoryPool::Alloc()
 void MemoryPool::Free(void * pFree)
 {
 	MemoryBlock * pMyBlock = pBlock;
-
+    if (pBlock == NULL)
+        return;
 	// Find the address pFree belong to which MemoryBlock
 	// tips: here code is verify that malloc heap is from
 	// low address to high address
@@ -87,6 +101,8 @@ void MemoryPool::Free(void * pFree)
 	{// 1
 		pPreBlock = pMyBlock;
 		pMyBlock = pMyBlock->pNext;
+        if (pMyBlock == NULL)
+            break;
 	}
 
 	if (pFree == NULL)
@@ -98,12 +114,13 @@ void MemoryPool::Free(void * pFree)
 
 	if (pMyBlock->nFree*nUnitSize == pMyBlock->nSize)
 	{
+        if (pPreBlock == pMyBlock)
+            pBlock = NULL;
 		pPreBlock->pNext = pMyBlock->pNext;
 		//delete pMyBlock;
         pMyBlock->~MemoryBlock();
         //MemoryBlock::operator delete(pMyBlock, sizeof(MemoryBlock)+ nInitSize*nUnitSize );
         MemoryBlock::operator delete(pMyBlock);
-
 	}
 	
 }
