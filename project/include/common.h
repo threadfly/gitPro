@@ -2,7 +2,9 @@
 #define _COMMON_
 
 #include <stddef.h>
-#include <new>
+//#include <new>
+
+#define DEBUG
 
 using namespace std;
 

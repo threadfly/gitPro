@@ -9,6 +9,13 @@ MemoryPool::MemoryPool(USHORT _nUnitSize, USHORT _nInitSize, USHORT _nGrowSize)
 	// 3.
 	nGrowSize 	= _nGrowSize;
 
+    if (_nUnitSize < sizeof(USHORT))
+    {
+        cout<<"_nUnitSize < sizeof(USHORT)):"<<"_nUnitSize:"<<_nUnitSize<<" "<<"sizeof(USHORT):"<<sizeof(USHORT)<<endl;
+        abort();
+        //exit(EXIT_FAILURE);
+    }
+
 	if (_nUnitSize > 4)
 	{
 		// 4. 将大于4字节的大小_nUnitSize往上取整大于_nUnitSize的最小的MEMPOOL_ALIGNMENT的倍数(前提是MEMPOOL_ALIGNMENT为2的整数倍)
@@ -92,7 +99,11 @@ void MemoryPool::Free(void * pFree)
 	if (pMyBlock->nFree*nUnitSize == pMyBlock->nSize)
 	{
 		pPreBlock->pNext = pMyBlock->pNext;
-		delete pMyBlock;
+		//delete pMyBlock;
+        pMyBlock->~MemoryBlock();
+        //MemoryBlock::operator delete(pMyBlock, sizeof(MemoryBlock)+ nInitSize*nUnitSize );
+        MemoryBlock::operator delete(pMyBlock);
+
 	}
 	
 }
@@ -102,6 +113,16 @@ MemoryPool::~MemoryPool()
 	MemoryBlock * pMyBlock = pBlock;
 	while( pMyBlock)
 	{
-		delete pMyBlock;
+		//delete pMyBlock;
+        MemoryBlock * pTmp = pMyBlock->pNext;
+        
+        // 这条操作应该相当于他下面的操作才对
+        delete pMyBlock;
+        /*
+        pMyBlock->~MemoryBlock();
+        //MemoryBlock::operator delete(pMyBlock, sizeof(MemoryBlock)+ nInitSize*nUnitSize );
+        MemoryBlock::operator delete(pMyBlock);
+        */
+        pMyBlock = pTmp;
 	}
 }

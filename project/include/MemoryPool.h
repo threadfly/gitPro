@@ -3,6 +3,7 @@
 
 #include "MemoryBlock.h"
 #include "common.h"
+#include "stdlib.h"
 
 class MemoryPool
 {
