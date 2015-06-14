@@ -4,8 +4,8 @@
 class A
 {
 public:
-	A();
-	~A();
+	A(){}
+	~A(){}
 private:
 	USHORT a;
 };
@@ -13,7 +13,7 @@ private:
 int main()
 {
 	MemoryPool pool(sizeof(A));
-	A * pA = (A *)pool.Alloc();
+	A * pA = new (pool.Alloc()) A;
 	return 0;
 }
 
