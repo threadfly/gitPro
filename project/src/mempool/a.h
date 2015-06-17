@@ -17,6 +17,7 @@ public:
     ~A();
 private:
     USHORT a;
+	USHORT b_array[1000];
 };
 
 

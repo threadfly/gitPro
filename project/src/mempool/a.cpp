@@ -16,5 +16,5 @@ A::A()
 
 A::~A()
 {
-    cout<<"~A:"<<a<<endl;
+    //cout<<"~A:"<<a<<endl;
 }
