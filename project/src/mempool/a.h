@@ -9,8 +9,9 @@
 #define _A_H
 
 #include "common.h"
+#include "MemPool.h"
 
-class A
+class A:public MemPool<A, 8000, 1024>
 {
 public:
     A();
