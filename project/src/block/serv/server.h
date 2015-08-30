@@ -80,7 +80,7 @@ void BlockServer::Run()
 			return;
 		}
 		p->SetFdLinger(1, 5);
-		//SetFdTimeOut(connfd);
+		p->SetFdTimeOut();
 	}
 	while(true)
 	{
@@ -145,7 +145,7 @@ void BlockServer::Run()
 				return;
 			}
 			p->SetFdLinger(1, 5);
-			//SetFdTimeOut(connfd);
+			p->SetFdTimeOut();
 		}else{
 			std::cout<< "Server sleeping ..." << std::endl;
 			slp.Start();
