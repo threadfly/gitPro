@@ -2,8 +2,8 @@
 #define _NET_EVENT_
 #include "net.h"
 
-#define TIMEOUT_SEC 2
-#define TIMEOUT_USEC 0
+#define TIMEOUT_SEC 0
+#define TIMEOUT_USEC 400000
 namespace Common
 {
 
@@ -29,6 +29,8 @@ namespace Net
 		void SetFdTimeOut();
 
 		void SetFdLinger(int open, int sec);
+
+		int GetFd(){return m_fd;}
 	private:
 		int		m_fd;
 		char	m_buf[EVENT_BUF];
@@ -58,6 +60,11 @@ namespace Net
 		{
 			bcopy(m_buf+m_read, src, len);
 			m_read += len;
+			if (m_read >= EVENT_BUF)
+			{
+				m_read = 0;
+				m_write = 0;
+			}
 			return len;
 		}
 		else if ( len > (m_write - m_read))
@@ -65,6 +72,11 @@ namespace Net
 			int read_size = m_write - m_read;
 			bcopy(m_buf+m_read, src, read_size);
 			m_read = m_write;
+			if (m_read >=  EVENT_BUF)
+			{
+				m_read = 0;
+				m_write = 0;
+			}
 			return read_size;
 		}
 		return 0;

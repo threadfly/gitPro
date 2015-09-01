@@ -100,7 +100,7 @@ int SocketServer::Accept(struct sockaddr *cliaddr, socklen_t * addrlen)
 		return -1;
 	}*/
 	int connfd = accept(m_socketid, cliaddr, addrlen);
-	if ( connfd < 1)
+	if ( connfd < 0)
 	{
 		if (errno == EAGAIN)
 		{

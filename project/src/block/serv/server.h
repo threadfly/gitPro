@@ -1,7 +1,8 @@
 #ifndef _SERVER_
 #define _SERVER_
 
-#include "sys/types.h"
+#include <sys/types.h>
+#include <signal.h>
 
 #include <iostream>
 #include <map>
@@ -82,6 +83,7 @@ void BlockServer::Run()
 		p->SetFdLinger(1, 5);
 		p->SetFdTimeOut();
 	}
+	signal(SIGPIPE, SIG_IGN);
 	while(true)
 	{
 		for(EVENT_MAP::iterator it = m_event_map.begin();
@@ -105,13 +107,9 @@ void BlockServer::Run()
 					std::cout<< "Server recv from fd:" << it->first << " data:"<<buf << std::endl;
 					//bzero(buf, BUF_MAX_SIZE);
 					write_len = snprintf(buf+len, BUF_MAX_SIZE, "Server Welcome you, your fd is %d !!\n", it->first);
+					int ret = (it->second)->Write(buf, strlen(buf));
+					std::cout << "Ret:"<< ret <<" write_len:" << write_len<<"  Write data:" << buf << std::endl;
 				}
-				else 
-				{
-					write_len = snprintf(buf, BUF_MAX_SIZE, "Server Welcome you, your fd is %d !!\n", it->first);
-				}
-				int ret = (it->second)->Write(buf, strlen(buf));
-				std::cout << "Ret:"<< ret <<" write_len:" << write_len<<"  Write data:" << buf << std::endl;
 				++it;
 				bzero(buf, BUF_MAX_SIZE);
 			}
@@ -147,8 +145,8 @@ void BlockServer::Run()
 			p->SetFdLinger(1, 5);
 			p->SetFdTimeOut();
 		}else{
-			std::cout<< "Server sleeping ..." << std::endl;
-			slp.Start();
+			//std::cout<< "Server sleeping ..." << std::endl;
+			//slp.Start();
 		}
 	}
 }
