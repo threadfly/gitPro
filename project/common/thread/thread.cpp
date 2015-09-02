@@ -55,3 +55,4 @@ bool Thread::Join()
 } // namespace Thread
 
 } // namespace Common
+

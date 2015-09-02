@@ -1,7 +1,11 @@
 #ifndef _THREAD_
 #define _THREAD_
+
+#include <pthread.h>
+
 #include "noncopyable.h"
-#include "pthread.h"
+#include "thread_mutex.h"
+#include "thread_cond.h"
 
 namespace Common {
 
@@ -46,13 +50,20 @@ namespace Thread {
 			}
 
 			bool Join();
+
+			Mutex & GetMutex(){return m_mutex;}
+
+			Cond & GetCond(){return m_cond;}
 		private:
 			pthread_t		m_pid;
 			pthread_attr_t	m_attr;
 			bool			m_isDetach;
+			Mutex			m_mutex;
+			Cond			m_cond;
 		};
 
 } // namespace Thread
 
 } // namespace Common
 #endif
+
