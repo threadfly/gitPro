@@ -10,13 +10,13 @@ namespace Thread
 	{
 		//m_mutex = PTHEAD_MUTEX_INITIALIZER;
 		int ret = pthread_mutexattr_settype(&m_attr, MUTEX_ATTR);
-		if ( 0 != ret)
+		if ( 0 != ret )
 		{
-			SyncLog::LOG(EROR, "pthread_mutexattr_settype error");
+			SyncLog::LOG(EROR, "pthread_mutexattr_settype error | ret:%d", ret);
 		}
 
 		ret = ::pthread_mutex_init(&m_mutex, &m_attr);
-		if (0 != ret)
+		if ( 0 != ret )
 		{
 			SyncLog::LOG(EROR, "pthread_mutex_init error");
 		}
@@ -25,20 +25,20 @@ namespace Thread
 	Mutex::~Mutex()
 	{
 		int ret = ::pthread_mutex_destroy(&m_mutex);
-		if ( ret != 0)
+		if ( 0 != ret )
 		{
 			//perror("~Mutex mutex destroy error");
-			SyncLog::LOG(EROR, "~Mutex mutex destroy error");
+			SyncLog::LOG(EROR, "~Mutex mutex destroy error | ret:%d", ret);
 		}
 	}
 
 	int Mutex::Lock()
 	{
 		int ret = ::pthread_mutex_lock(&m_mutex);
-		if (ret != 1)
+		if ( 0 != ret )
 		{
 			//perror("pthread_mutex_lock error");
-			SyncLog::LOG(EROR, "pthread_mutex_lock error");
+			SyncLog::LOG(EROR, "pthread_mutex_lock error | ret:%d", ret);
 		}
 		return ret;
 	}
@@ -46,9 +46,9 @@ namespace Thread
 	int Mutex::UnLock()
 	{
 		int ret = ::pthread_mutex_unlock(&m_mutex);
-		if (ret != 1)
+		if ( 0 != ret )
 		{
-			SyncLog::LOG(EROR, "pthread_mutex_unlock error");
+			SyncLog::LOG(EROR, "pthread_mutex_unlock error | ret:%d", ret);
 			//perror("pthread_mutex_unlock error");
 		}
 		return ret;
@@ -59,7 +59,7 @@ namespace Thread
 		int ret = ::pthread_mutex_trylock(&m_mutex);
 		if ( 0 != ret)
 		{
-			SyncLog::LOG(EROR, "pthread_mutex_trylock error");
+			SyncLog::LOG(EROR, "pthread_mutex_trylock error | ret:%d", ret);
 		}
 		return ret;
 	}

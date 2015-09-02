@@ -12,7 +12,7 @@ namespace Thread
 		int ret = ::pthread_cond_init(&m_cond, NULL);
 		if ( 0 != ret)
 		{
-			SyncLog::LOG(EROR, "pthread_cond_init error");
+			SyncLog::LOG(EROR, "pthread_cond_init error | ret:%d", ret);
 		}
 	}
 	
@@ -21,7 +21,7 @@ namespace Thread
 		int ret = ::pthread_cond_destroy(&m_cond);
 		if ( 0 != ret)
 		{
-			SyncLog::LOG(EROR, "pthread_cond_destroy error");
+			SyncLog::LOG(EROR, "pthread_cond_destroy error | ret:%d", ret);
 		}
 	}
 
@@ -30,7 +30,7 @@ namespace Thread
 		int ret = ::pthread_cond_wait(&m_cond, &mutex.m_mutex);
 		if ( 0 != ret )
 		{
-			SyncLog::LOG(EROR, "pthread_cont_wait error");
+			SyncLog::LOG(EROR, "pthread_cont_wait error | ret:%d", ret);
 			//perror("pthread_cont_wait error");
 		}
 		return ret;
@@ -41,7 +41,7 @@ namespace Thread
 		int ret = ::pthread_cond_signal(&m_cond);
 		if ( 0 != ret)
 		{
-			SyncLog::LOG(EROR, "pthread_cont_signal error");
+			SyncLog::LOG(EROR, "pthread_cont_signal error | ret:%d", ret);
 			//perror("pthread_cont_signal error");
 		}
 		return ret;
@@ -64,7 +64,7 @@ namespace Thread
 		int ret = ::pthread_cond_timedwait(&m_cond, &mutex.m_mutex, &ts);
 		if ( ret != 0 )
 		{
-			SyncLog::LOG(EROR, "pthread_cond_timewait error");
+			SyncLog::LOG(EROR, "pthread_cond_timewait error | ret:%d", ret);
 			//perror("pthread_cond_timewait error");
 		}
 		return ret;
@@ -75,7 +75,7 @@ namespace Thread
 		int ret = ::pthread_cond_broadcast(&m_cond);
 		if ( 0 != ret)
 		{
-			SyncLog::LOG(EROR, "pthread_cond_broadcast error");
+			SyncLog::LOG(EROR, "pthread_cond_broadcast error | ret%d", ret);
 			//perror("pthread_cond_broadcast error");
 		}
 		return ret;
