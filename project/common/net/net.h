@@ -17,5 +17,6 @@ using std::endl;
 #define SA struct sockaddr
 #define BUFSIZE 65535
 #define ListenQ	1024
+
 #endif
 

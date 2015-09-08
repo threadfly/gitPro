@@ -41,7 +41,7 @@ void AcceptServer::Run()
 		if ( NULL != pevent)
 		{
 			pevent->SetFdLinger(1, 1);
-			pevent->SetFdTimeOut();
+			//pevent->SetFdTimeOut();
 
 			// lock
 			GetMutex().Lock();
@@ -62,7 +62,7 @@ void AcceptServer::Run()
 			if ( NULL != pevent)
 			{
 				pevent->SetFdLinger(1, 1);
-				pevent->SetFdTimeOut();
+				//pevent->SetFdTimeOut();
 
 				// lock
 				GetMutex().Lock();
