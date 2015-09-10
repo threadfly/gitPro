@@ -1,27 +1,28 @@
-#ifndef _NET_PACKET
-#define _NET_PACKET
+#include "net_packet.h"
 
 namespace Common
 {
 
-namespace Net
+namespace NetReactor
 {
 
-NetPacket::NetPacket():
-m_buff_len(0)
+NetPacket::NetPacket(long id):
+m_buff_len(0),
+m_handler_id(id)
 {
 }
 
 int NetPacket::Write(const void * src, int len)
 {
-	len = len > PACKET_BUFF_SIZE ? PACKET_BUFF_SIZE : len;
+	memset(m_buff, 0, NET_PACKET_BUFF_SIZE);
+	len = len > NET_PACKET_BUFF_SIZE ? NET_PACKET_BUFF_SIZE : len;
 	::memcpy((void *)m_buff, src, len);
 	return len;
 }
 
-int NetPacket::Read(char * buff, int len)
+int NetPacket::Read(void * buff, int len)
 {
-	len = len > PACKET_BUFF_SIZE ? PACKET_BUFF_SIZE : len;
+	len = len > NET_PACKET_BUFF_SIZE ? NET_PACKET_BUFF_SIZE : len;
 	::memcpy(buff, m_buff, len);
 	return len;
 }
@@ -30,4 +31,3 @@ int NetPacket::Read(char * buff, int len)
 
 }
 
-#endif

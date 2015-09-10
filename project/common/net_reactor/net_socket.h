@@ -8,7 +8,7 @@ namespace Common
 
 namespace NetReactor
 {
-
+	using namespace Common::Log;
 	class Socket
 	{
 	public:
@@ -23,6 +23,10 @@ namespace NetReactor
 		int Connect(const SA * sa, int len);
 
 		int Close(){ return ::close(m_socketid);}
+
+		int GetSocketOpt(int level, int optname, void * optval, SL * sl);
+
+		int SetSocketOpt(int level, int optname, const void * optval, SL sl);
 	public:
 		/* read & write */
 		int Recv(void * buff, size_t nbytes, int flags);
@@ -35,6 +39,8 @@ namespace NetReactor
 
 	public:
 		int GetSocketId(){ return m_socketid; };
+
+		void SetSocketId(int fd) { m_socketid = fd; }
 	private:
 		int					m_socketid;
 		//struct sockaddr_in	m_servaddr;

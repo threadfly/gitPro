@@ -2,22 +2,30 @@
 #define _NET_MANAGER_
 
 #include <queue>
+#include <string>
+#include <map>
 
-#include "net_share.h"
-#include "net_packet.h"
 #include "thread/thread.h"
+#include "idgenerator.h"
 
 namespace Common
 {
 
-namespace Net
+namespace NetReactor
 {
 	using namespace std;
 
 	using namespace Common::Thread;
+	using namespace Common::Tools;
 
-	class NetManager::public Thread
+	class Reactor;
+	class NetPacket;
+	class EventHandler;
+
+	class NetManager:public Common::Thread::Thread
 	{
+	public:
+		typedef std::map<long, EventHandler*> ID_HANDLER_MAP;
 	public:
 		NetManager();
 
@@ -33,11 +41,20 @@ namespace Net
 
 		int AddRecvNetPacket(NetPacket *);
 
-		NetPacket * getSendNetPacket();
-
 		int AddSendNetPacket(NetPacket *);
 		
-		Reactor * GetReactor(){ return m_reactor;};
+		Reactor * GetReactor(){ return m_reactor;}
+	
+		long GenerateId();
+
+		bool SetHandlerId(long, EventHandler * );
+
+		void RemoveHandlerId(long );
+	private:
+		NetPacket * GetSendNetPacket();
+
+		void SendPacketDeque();
+
 	private:
 		std::queue<NetPacket *> m_recv_packet_deque;
 
@@ -49,6 +66,10 @@ namespace Net
 		string					m_listen_ip;
 		
 		int						m_listen_port;
+
+		IDGenerator				m_id_gnt;
+
+		ID_HANDLER_MAP			 m_handler_idm;
 	};
 }
 
@@ -56,3 +77,4 @@ namespace Net
 
 
 #endif
+

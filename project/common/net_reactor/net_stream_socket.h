@@ -1,22 +1,24 @@
 #ifndef _NET_STREAM_SOCKET_
 #define _NET_STREAM_SOCKET_
 
-#include "net_share.h"
+#include <string>
+
 #include "net_socket.h"
-#include "net_manager.h"
-#include "net_packet.h"
-#include "log/sync_log.h"
+#include "net_event_handler.h"
 
 namespace Common
 {
 
 namespace NetReactor
 {
+	using namespace std;
+	class NetManager;
+	class Socket;
 
 	class StreamSocket:public EventHandler
 	{
 	public:
-		StreamSocket(NetManager * , string & local_ip, int local_port, string & remote_ip, int remote_port);
+		StreamSocket(NetManager * , int socketfd,  string & local_ip, int local_port, string & remote_ip, int remote_port);
 
 		virtual ~StreamSocket(){};
 
@@ -28,11 +30,14 @@ namespace NetReactor
 		virtual int HandleOutput();
 		
 		virtual int HandleClose();
+
+		int Write(const void * buff, size_t nbytes);
+
 	private:
 		string			m_local_ip;
 		int				m_local_port;
 		string			m_remote_ip;
-		string			m_remote_port;
+		int				m_remote_port;
 		Socket			m_socket;
 	};
 

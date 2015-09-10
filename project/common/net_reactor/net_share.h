@@ -11,11 +11,14 @@
 
 #include "log/sync_log.h"
 
+/*
+typedef struct sockaddr SA;
+typedef struct socklen_t SL;
+typedef struct sockaddr_in SAI;
+*/
 #define SA struct sockaddr
-#define SL struct socklen_t
-
+#define SL socklen_t
 #define SAI struct sockaddr_in
-
 
 #define ListenQ 1024
 #define NET_PACKET_BUFF_SIZE 1024

@@ -1,4 +1,8 @@
 #include "net_connect_socket.h"
+#include "net_manager.h"
+#include "log/sync_log.h"
+#include "net_share.h"
+#include "net_reactor.h"
 
 namespace Common
 {
@@ -7,7 +11,7 @@ namespace NetReactor
 {
 
 ConnectSocket::ConnectSocket(NetManager * nm):
-m_net_manager(nm)
+EventHandler(nm)
 {
 }
 
@@ -18,13 +22,13 @@ int ConnectSocket::GetFd()
 
 int ConnectSocket::HandleInput()
 {
-	SyncLog::Log(INFO, "Client ConnectSocket HandleInput");
+	SyncLog::LOG(INFO, "Client ConnectSocket HandleInput");
 	return 0;
 }
 
 int ConnectSocket::HandleOutput()
 {
-	SyncLog::Log(INFO, "Client ConnectSocket HandleOutput");
+	SyncLog::LOG(INFO, "Client ConnectSocket HandleOutput");
 	return 0;
 }
 
@@ -34,7 +38,7 @@ int ConnectSocket::CreateTcpClient(const string & ip, const int port)
 	ret = m_socket.Init(AF_INET, SOCK_STREAM, 0);
 	if ( -1 == ret )
 	{
-		SyncLog::Log(EROR, "ConnectSocket CreateTcpClient Error, ret:%d", ret);
+		SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient Error, ret:%d", ret);
 		return ret;
 	}
 
@@ -48,14 +52,14 @@ int ConnectSocket::CreateTcpClient(const string & ip, const int port)
 	{
 		if ( 0 ==  inet_pton(AF_INET, m_remote_ip.c_str(), &sai.sin_addr))
 		{
-			SyncLog::Log(EROR, "ConnectSocket CreateTcpClient inet_pton error, m_remote_ip:%s", m_remote_ip);
+			SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient inet_pton error, m_remote_ip:%s", m_remote_ip.c_str());
 			return -1;
 		}
 	}
 	else
 	{
 		//TODO 客户端可以不指定远程IP么?
-		SyncLog::Log(EROR, "ConnectSocket CreateTcpClient  , m_remote_ip:%s", m_remote_ip);
+		SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient  , m_remote_ip:%s", m_remote_ip.c_str());
 		return -1;
 	}
 	sai.sin_port = htons(m_remote_port);
@@ -65,23 +69,23 @@ int ConnectSocket::CreateTcpClient(const string & ip, const int port)
 	{
 		if (errno == EAGAIN)
 		{
-			SyncLog::Log(EROR, "ConnectSocket CreateTcpClient ,errno:EAGAIN  m_remote_ip:%s", m_remote_ip);
+			SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient ,errno:EAGAIN  m_remote_ip:%s", m_remote_ip.c_str());
 		}
 		else if (errno == EWOULDBLOCK)
 		{
-			SyncLog::Log(EROR, "ConnectSocket CreateTcpClient ,errno:EWOULDBLOCK m_remote_ip:%s", m_remote_ip);
+			SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient ,errno:EWOULDBLOCK m_remote_ip:%s", m_remote_ip.c_str());
 		}
 		else if (errno == EFAULT)
 		{
-			SyncLog::Log(EROR, "ConnectSocket CreateTcpClient ,errno:EFAULT m_remote_ip:%s", m_remote_ip);
+			SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient ,errno:EFAULT m_remote_ip:%s", m_remote_ip.c_str());
 		}
 		else if (errno == ECONNABORTED)
 		{
-			SyncLog::Log(EROR, "ConnectSocket CreateTcpClient ,errno:ECONNABORTED m_remote_ip:%s", m_remote_ip);
+			SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient ,errno:ECONNABORTED m_remote_ip:%s", m_remote_ip.c_str());
 		}
 		else 
 		{
-			SyncLog::Log(EROR, "ConnectSocket CreateTcpClient ,errno:%d m_remote_ip:%s", errno,  m_remote_ip);
+			SyncLog::LOG(EROR, "ConnectSocket CreateTcpClient ,errno:%d m_remote_ip:%s", errno,  m_remote_ip.c_str());
 		}
 		return -1;
 	}
@@ -92,12 +96,12 @@ int ConnectSocket::CreateTcpClient(const string & ip, const int port)
 
 int ConnectSocket::HandleClose()
 {
-	m_socket.Close();
+	return m_socket.Close();
 }
 
 void ConnectSocket::CloseTcpClient()
 {
-	m_reactor->RemoveRegister(this);
+	m_net_manager->GetReactor()->RemoveHandler(this);
 	//m_socket.Close();
 }
 

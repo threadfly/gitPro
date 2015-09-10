@@ -36,7 +36,7 @@ namespace Log
 
 		va_list args ;
 		va_start(args, Formate);
-		sprintf(log+index, Formate, args);
+		vsprintf(log+index, Formate, args);
 		va_end(args);
 
 		std::cout << log << std::endl;

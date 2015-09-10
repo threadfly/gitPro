@@ -1,4 +1,8 @@
-#include "netepoll.h"
+#include <sys/epoll.h>
+#include "log/sync_log.h"
+#include "net_epoll.h"
+#include "net_share.h"
+#include "net_event_handler.h"
 
 namespace Common
 {
@@ -9,13 +13,13 @@ namespace NetReactor
 	Epoll::Epoll(NetManager * nm):
 	Reactor(nm)
 	{
-		epoll_event * = new (struct epoll_event)[MAX_EVENTS];
+		m_events = new struct epoll_event[MAX_EVENTS];
 
-		m_epfd = ::epoll_create();
+		m_epfd = ::epoll_create(100);
 
 		if ( -1 == m_epfd)
 		{
-			SyncLog::Log(EROR, "epoll_create error!!");
+			SyncLog::LOG(EROR, "epoll_create error!!");
 			exit(EXIT_FAILURE);
 		}
 		
@@ -29,13 +33,21 @@ namespace NetReactor
 			EventHandler * peh = (EventHandler *)(m_events[i].data.ptr);
 			if ( NULL == peh )
 			{
-				SyncLog::Log(EROR, "Epoll RunReactorEventLoop peh is NULL!!");
+				SyncLog::LOG(EROR, "Epoll RunReactorEventLoop peh is NULL!!");
 				continue;
 			}
 
 			if ( m_events[i].events & EPOLLIN )
 			{
-				peh->HandleInput();
+				int ret = peh->HandleInput();
+				if (-2 == ret)
+				{
+					RemoveHandler(peh);
+					peh->HandleClose();
+					m_net_manager->RemoveHandlerId(peh->GetId());
+					delete peh;
+				}
+
 			}
 
 			if ( m_events[i].events & EPOLLOUT)
@@ -46,13 +58,16 @@ namespace NetReactor
 			if ( m_events[i].events & EPOLLERR || m_events[i].events & EPOLLHUP)
 			{
 				// TODO peh->HandleException();
+				RemoveHandler(peh);
 			}
 		}
+		return nfds;
 	}
 
 	int Epoll::EndReactorEventLoop()
 	{
 		// TODO 这里该怎么处理那些handler? 怎么delete?
+		return 0;
 	}
 
 	int Epoll::RegisterHandler(EventHandler * handler)
@@ -68,12 +83,12 @@ namespace NetReactor
 		{
 			if ( errno == EEXIST)
 			{
-				SyncLog::Log(EROR, "Epoll RegisterHandler Error, errno:EEXIST");
+				SyncLog::LOG(EROR, "Epoll RegisterHandler Error, errno:EEXIST");
 				return -1;
 			} 
 			else 
 			{
-				SyncLog::Log(EROR, "Epoll RegisterHandler Error, errno:%d", errno);
+				SyncLog::LOG(EROR, "Epoll RegisterHandler Error, errno:%d", errno);
 				return -1;
 			}
 
@@ -87,11 +102,13 @@ namespace NetReactor
 		struct epoll_event ev;
 		// TODO Linux 内核版本为 2.6.9之前的内核版本需要这个ev
 		::epoll_ctl(m_epfd, EPOLL_CTL_DEL, handler->GetFd(), &ev);
-
-		handler->HandleClose();
 		
+		SyncLog::LOG(INFO, "Epoll RemoveHandler Close Handler");
+		//handler->HandleClose();
+		
+		//m_net_manager->RemoveHandlerId(handler->GetId());
 		// TODO 这里处理对否?
-		delete handler;
+		//delete handler;
 
 		return 0;
 	}

@@ -1,18 +1,18 @@
 #ifndef _NET_ACCEPT_SOCKET
 #define _NET_ACCEPT_SOCKET
 
-#include "net_share.h"
+#include <string>
 #include "net_event_handler.h"
 #include "net_socket.h"
-#include "net_manager.h"
-#include "log/sync_log.h"
 
 namespace Common
 {
 
 namespace NetReactor
 {
-	
+	using namespace std;
+	class NetManager;
+
 	class AcceptSocket:public EventHandler
 	{
 	public:
@@ -32,7 +32,6 @@ namespace NetReactor
 
 		void CloseTcpServer();
 	private:
-		NetManager *	m_net_manager;
 		string			m_local_ip;
 		int				m_local_port;
 		Socket			m_socket;

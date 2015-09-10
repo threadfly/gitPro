@@ -1,21 +1,23 @@
-#ifdef _NET_EPOLL_
+#ifndef _NET_EPOLL_
 #define _NET_EPOLL_
 
-#include <sys/epoll.h>
-
 #include "net_reactor.h"
-#include "log/sync_log.h"
 
 namespace Common
 {
 
 namespace NetReactor
 {
+	using namespace Common::Log;
+	class Reactor;
+	class NetManager;
+	class EventHandler;
+
 	#define MAX_EVENTS 100000
 	class Epoll:public Reactor
 	{
 	public:
-		Epoll();
+		Epoll(NetManager *);
 
 		virtual ~Epoll(){};
 
@@ -39,3 +41,4 @@ namespace NetReactor
 }
 
 #endif
+

@@ -1,17 +1,18 @@
 #ifndef _NET_CONNECT_SOCKET
 #define _NET_CONNECT_SOCKET
 
-#include "net_share.h"
+#include <string>
+
 #include "net_event_handler.h"
 #include "net_socket.h"
-#include "net_manager.h"
-#include "log/sync_log.h"
 
 namespace Common
 {
 
 namespace NetReactor
 {
+	using namespace std;
+	class NetManager;
 
 	class ConnectSocket: public EventHandler
 	{
@@ -32,7 +33,7 @@ namespace NetReactor
 
 		void CloseTcpClient();
 	private:
-		NetManager *	m_net_manager;
+		Socket			m_socket;
 		string			m_remote_ip;
 		int				m_remote_port;
 	};

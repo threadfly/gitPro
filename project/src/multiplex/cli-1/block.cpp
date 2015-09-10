@@ -1,6 +1,6 @@
 #include "client.h"
 
-#define CLIENT_NUM 300
+#define CLIENT_NUM 1
 int main()
 {
 	BlockClient* client[CLIENT_NUM];
