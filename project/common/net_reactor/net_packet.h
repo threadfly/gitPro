@@ -9,6 +9,7 @@ namespace Common
 namespace NetReactor
 {
 	class EventHandler;
+
 	class NetPacket
 	{
 	public:

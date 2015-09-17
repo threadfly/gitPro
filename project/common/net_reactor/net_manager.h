@@ -26,6 +26,8 @@ namespace NetReactor
 	{
 	public:
 		typedef std::map<long, EventHandler*> ID_HANDLER_MAP;
+
+		typedef std::map<uint32_t, >
 	public:
 		NetManager();
 
@@ -34,6 +36,10 @@ namespace NetReactor
 		virtual void Run();
 
 		int Work();
+
+		void Stop();
+		//一般用于其他线程等待此网络线程接收到客户端数据用
+		void Wait();
 
 		int LoadConfig();
 
@@ -69,7 +75,9 @@ namespace NetReactor
 
 		IDGenerator				m_id_gnt;
 
-		ID_HANDLER_MAP			 m_handler_idm;
+		ID_HANDLER_MAP			m_handler_idm;
+
+		bool					m_stop;
 	};
 }
 

@@ -13,8 +13,9 @@ namespace NetReactor
 {
 
 NetManager::NetManager():
-Thread(false),
-m_id_gnt()
+Thread(true),
+m_stop(false)
+//m_id_gnt()
 {
 #ifdef EPOLL_REACTOR
 	m_reactor = new Epoll(this); // TODO  这样做对否, 在NetManager还没完全构造完毕时就把它作为参数去构造另一个?
@@ -33,6 +34,17 @@ void NetManager::Run()
 		//3. 处理 m_send_packet_deque 队列
 		SendPacketDeque();
 		//4. ......
+		if ( m_stop)
+		{
+			break;
+		}
+	}
+	// 关掉时处理未发送的...
+	ID_HANDLER_MAP::iterator it; 
+	for( ; it != m_handler_idm.end(); ++it)
+	{
+		m_reactor->RemoveHandler(it->second);
+		delete it->second;
 	}
 }
 
@@ -65,6 +77,15 @@ int NetManager::Work()
 	//
 	//5. ......
 	return 0;
+}
+
+void NetManager::Wait()
+{
+	GetMutex().Lock();
+
+	GetCond().Wait(GetMutex());
+
+	GetMutex().UnLock();
 }
 
 int NetManager::LoadConfig()
@@ -109,6 +130,8 @@ int NetManager::AddRecvNetPacket(NetPacket * packet)
 
 	m_recv_packet_deque.push(packet);
 
+	GetCond().Signal();
+
 	GetMutex().UnLock();
 
 	return 0;
@@ -141,14 +164,15 @@ void NetManager::SendPacketDeque()
 		ID_HANDLER_MAP::iterator it = m_handler_idm.find(packet->m_handler_id);
 		if (it == m_handler_idm.end())
 		{
-			SyncLog::LOG(EROR, "NetManager SendPacketDeque hid have Deleted!!");
-			continue;
+			SyncLog::LOG(EROR, "NetManager SendPacketDeque hid have Deleted!!%s",packet->m_buff);
 		}
-
-		StreamSocket * pss = dynamic_cast<StreamSocket *>(it->second);
-		if ( NULL != pss)
+		else
 		{
-			pss->Write(packet->m_buff, sizeof(packet->m_buff));
+			StreamSocket * pss = dynamic_cast<StreamSocket *>(it->second);
+			if ( NULL != pss)
+			{
+				pss->Write(packet->m_buff, ::strlen(packet->m_buff));
+			}
 		}
 
 		delete packet;
@@ -173,6 +197,11 @@ bool NetManager::SetHandlerId(long id, EventHandler * eh)
 void NetManager::RemoveHandlerId(long id)
 {
 	m_handler_idm.erase(id);
+}
+
+void NetManager::Stop()
+{
+	m_stop = true;
 }
 
 }

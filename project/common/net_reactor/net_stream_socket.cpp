@@ -41,6 +41,7 @@ int StreamSocket::HandleInput()
 	 * ...... 
 	 */
 	int n = m_socket.Recv((void *)(ppacket->m_buff), NET_PACKET_BUFF_SIZE, 0);
+	SyncLog::LOG(INFO, "StreamSocket Recv:%s", ppacket->m_buff);
 	if ( -1 == n)
 	{
 		if (EAGAIN == errno || EWOULDBLOCK == errno)

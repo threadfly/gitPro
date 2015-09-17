@@ -17,7 +17,7 @@ int main()
 	{
 		return -1;
 	}
-	Sleeper slp(0, 500000);
+	Sleeper slp(0, 5000);
 	while(true)
 	{
 		packet = g_net_manager.GetRecvNetPacket();
@@ -28,9 +28,10 @@ int main()
 			packet->Write(response, 1024);
 			g_net_manager.AddSendNetPacket(packet);
 			::memset(response, 0 , 1024);
+			SyncLog::LOG(INFO,"!!!!! respones:%s", response);
 		}
 		else
-			slp.Start();
+			g_net_manager.Wait();
 	}
 	return 0;
 }

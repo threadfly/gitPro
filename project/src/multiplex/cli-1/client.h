@@ -65,7 +65,9 @@ void BlockClient::Run()
 			std::cout << "clientid:"<< m_id<< " receive server:" << buf <<  std::endl;
 		}
 		bzero(buf, BUF_MAX_SIZE);
+		SyncLog::LOG(INFO, "buf:%s", buf);
 		snprintf(buf, BUF_MAX_SIZE, "I am client %d, happy see you! The num m_index is %d", m_id, m_index++);
+		std::cout<<"!!!!!! :"<< buf <<std::endl;
 		if (m_client.Write(buf, strlen(buf)) < 0)
 		{
 			std::cout << "clientid:"<< m_id<< " Write Error" << std::endl;
