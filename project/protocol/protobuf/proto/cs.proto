@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package cs;
+
+message C2S_Login
+{
+	required int32	id = 1;
+	required string name =2;
+}
+
+message S2C_Login
+{
+	required int32 ret = 1;
+}

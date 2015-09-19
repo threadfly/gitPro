@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package cs;
+
+enum ID {
+	ID_C2S_Login = 0;
+	ID_S2C_Login = 1;
+}
+
+enum RET {
+	RET_SUCCESS = 0;
+	RET_FAILD	= 1;
+}

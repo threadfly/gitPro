@@ -5,6 +5,8 @@
 #include "net_epoll.h"
 #include "net_accept_socket.h"
 #include "net_stream_socket.h"
+#include "net_packet_head.h"
+#include "net_send_pipe.h"
 
 namespace Common
 {
@@ -14,7 +16,8 @@ namespace NetReactor
 
 NetManager::NetManager():
 Thread(true),
-m_stop(false)
+m_stop(false),
+m_send_pipe(NULL)
 //m_id_gnt()
 {
 #ifdef EPOLL_REACTOR
@@ -32,7 +35,7 @@ void NetManager::Run()
 		//2. 事件循环 (包括等待产生事件, 并处理这些事件)
 		m_reactor->RunReactorEventLoop();
 		//3. 处理 m_send_packet_deque 队列
-		SendPacketDeque();
+		//SendPacketDeque();
 		//4. ......
 		if ( m_stop)
 		{
@@ -44,6 +47,7 @@ void NetManager::Run()
 	for( ; it != m_handler_idm.end(); ++it)
 	{
 		m_reactor->RemoveHandler(it->second);
+		it->second->HandleClose();
 		delete it->second;
 	}
 }
@@ -70,12 +74,27 @@ int NetManager::Work()
 		SyncLog::LOG(EROR, "NetManager Work RegisterHandler Error, %s:%d", m_listen_ip.c_str(), m_listen_port);
 		return -1;
 	}
-	//4. 启动NetManager线程
+
+	//4. 注册发送管道描述符到Reactor上
+	m_send_pipe = new SendPipe(this);
+	ret = m_send_pipe->Init();
+	if (-1 == ret)
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_send_pipe Init Error");
+		return -1;
+	}
+
+	if ( -1 == m_reactor->RegisterHandler(m_send_pipe))
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_send_pipe RegisterHandler Error");
+		return -1;
+	}
+	//5. 启动NetManager线程
 	if (0 != Start())
 		return -1;
-	//4. ......
+	//6. ......
 	//
-	//5. ......
+	//7. ......
 	return 0;
 }
 
@@ -182,26 +201,98 @@ void NetManager::SendPacketDeque()
 
 }
 
-long NetManager::GenerateId()
+uint32_t  NetManager::GenerateId()
 {
 	return m_id_gnt.GetNewID();
 }
 
-bool NetManager::SetHandlerId(long id, EventHandler * eh)
+bool NetManager::SetHandlerId(uint32_t id, EventHandler * eh)
 {
-	if ( m_handler_idm.insert(std::pair<long, EventHandler *>(id, eh)).second)
+	if ( m_handler_idm.insert(std::pair<uint32_t , EventHandler *>(id, eh)).second)
 		return true;
 	return false;
 }
 
-void NetManager::RemoveHandlerId(long id)
+void NetManager::RemoveHandlerId(uint32_t id)
 {
 	m_handler_idm.erase(id);
 }
 
+EventHandler * NetManager::GetHandleById(uint32_t id)
+{
+	ID_HANDLER_MAP::iterator it = m_handler_idm.find(id);
+	if (it != m_handler_idm.end())
+	{
+		return it->second;
+	}
+	return NULL;
+}
+
+
 void NetManager::Stop()
 {
 	m_stop = true;
+}
+
+NetPacket * NetManager::GetBuffNetPacket(uint32_t hid)
+{
+	NetPacket * tmp = NULL;
+	ID_PACKET_MAP::iterator it =  m_buff_packet_idm.find(hid);
+	if ( it != m_buff_packet_idm.end())
+	{
+		tmp = it->second;
+		m_buff_packet_idm.erase(it);
+		return tmp;
+	}
+	return NULL;
+}
+
+bool NetManager::SetBuffNetPacket(uint32_t hid, NetPacket * packet)
+{
+	if ( m_buff_packet_idm.insert(std::pair<uint32_t, NetPacket *>(hid, packet)).second)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void NetManager::SendMessage(InnerPacketHead &head,const void * message)
+{
+	int length = head.length;
+	m_send_pipe->HandleOutput((void *)&head, sizeof(head));
+	m_send_pipe->HandleOutput(message, length);
+	//WriteSendPipe((void *)&head, sizof(head));
+	//WriteSendPipe(message, length);
+}
+
+int NetManager::WorkAsServer()
+{
+	return Work();
+}
+
+int NetManager::WorkAsClient()
+{
+	//4. 注册发送管道描述符到Reactor上
+	m_send_pipe = new SendPipe(this);
+	int ret = m_send_pipe->Init();
+	if (-1 == ret)
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_send_pipe Init Error");
+		return -1;
+	}
+
+	if ( -1 == m_reactor->RegisterHandler(m_send_pipe))
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_send_pipe RegisterHandler Error");
+		return -1;
+	}
+	//5. 启动NetManager线程
+	if (0 != Start())
+		return -1;
+	//6. ......
+	
+	return 0;
 }
 
 }

@@ -54,7 +54,7 @@ int AcceptSocket::HandleInput()
 	return 0;
 }
 
-int AcceptSocket::HandleOutput()
+int AcceptSocket::HandleOutput(const void * buff, size_t nbytes)
 {
 	return 0;
 }
@@ -82,7 +82,7 @@ int AcceptSocket::CreateTcpServer(const string & ip, const int port )
 
 	std::cout << ip << ":" << port << std::endl;
 	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
-	SyncLog::LOG(EROR, " %s:%d AcceptSocket CreateTcpServer ", __FILE__, __LINE__);
+	SyncLog::LOG(INFO, " %s:%d AcceptSocket CreateTcpServer ", __FILE__, __LINE__);
 	m_local_ip = ip;
 	m_local_port = port;
 

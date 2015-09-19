@@ -21,7 +21,7 @@ int Pipe::Read(void * buff, size_t nbytes)
 
 	if ( -1 == num )
 	{
-		SyncLog::LOG(EROR, "Pipe Read read , errno:%d", errno)
+		SyncLog::LOG(EROR, "Pipe Read read , errno:%d", errno);
 		return -1;
 	}
 	return num;

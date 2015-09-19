@@ -24,7 +24,7 @@ namespace NetReactor
 
 		virtual int HandleInput();
 
-		virtual int HandleOutput();
+		virtual int HandleOutput(const void *, size_t nbytes);
 
 		virtual int HandleClose();
 

@@ -4,6 +4,7 @@
 #include <queue>
 #include <string>
 #include <map>
+#include <stdint.h>
 
 #include "thread/thread.h"
 #include "idgenerator.h"
@@ -21,13 +22,15 @@ namespace NetReactor
 	class Reactor;
 	class NetPacket;
 	class EventHandler;
+	class InnerPacketHead;
+	class SendPipe;
 
 	class NetManager:public Common::Thread::Thread
 	{
 	public:
-		typedef std::map<long, EventHandler*> ID_HANDLER_MAP;
+		typedef std::map<uint32_t, EventHandler*> ID_HANDLER_MAP;
 
-		typedef std::map<uint32_t, >
+		typedef std::map<uint32_t, NetPacket *> ID_PACKET_MAP;
 	public:
 		NetManager();
 
@@ -36,6 +39,10 @@ namespace NetReactor
 		virtual void Run();
 
 		int Work();
+		
+		int WorkAsServer();
+
+		int WorkAsClient();
 
 		void Stop();
 		//一般用于其他线程等待此网络线程接收到客户端数据用
@@ -51,16 +58,25 @@ namespace NetReactor
 		
 		Reactor * GetReactor(){ return m_reactor;}
 	
-		long GenerateId();
+		uint32_t GenerateId();
 
-		bool SetHandlerId(long, EventHandler * );
+		bool SetHandlerId(uint32_t, EventHandler * );
 
-		void RemoveHandlerId(long );
+		void RemoveHandlerId(uint32_t);
+
+		EventHandler * GetHandleById(uint32_t);
+		
+		void SendMessage(InnerPacketHead &head,const void * message);
+
+		NetPacket * GetBuffNetPacket(uint32_t);
+
+		bool SetBuffNetPacket(uint32_t, NetPacket *);
 	private:
 		NetPacket * GetSendNetPacket();
 
 		void SendPacketDeque();
 
+		//void WriteSendPipe(const void *, uint32_t );
 	private:
 		std::queue<NetPacket *> m_recv_packet_deque;
 
@@ -76,8 +92,14 @@ namespace NetReactor
 		IDGenerator				m_id_gnt;
 
 		ID_HANDLER_MAP			m_handler_idm;
+		
+		// 这个应该是未读取完一个包临时存的,下读继续缓存在这里,直到满一个包
+		// 再放入m_recv_packet_deque中
+		ID_PACKET_MAP			m_buff_packet_idm;
 
 		bool					m_stop;
+
+		SendPipe *				m_send_pipe;
 	};
 }
 

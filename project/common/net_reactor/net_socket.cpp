@@ -73,7 +73,7 @@ int Socket::Connect(const SA * sa, int len)
 	{
 		SyncLog::LOG(EROR, "Socket Connect Error, ret:%d errno:%d", ret, errno);
 	}
-	return -1;
+	return ret;
 }
 
 int Socket::Recv(void * buff, size_t nbytes, int flags)

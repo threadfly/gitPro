@@ -27,7 +27,7 @@ namespace NetReactor
 
 	int Epoll::RunReactorEventLoop()
 	{
-		int nfds = ::epoll_wait(m_epfd, m_events, MAX_EVENTS, 5); // 最长等待500毫秒
+		int nfds = ::epoll_wait(m_epfd, m_events, MAX_EVENTS, -1); // 最长等待500毫秒
 		for (int i = 0; i < nfds; ++i)
 		{
 			EventHandler * peh = (EventHandler *)(m_events[i].data.ptr);
@@ -52,7 +52,8 @@ namespace NetReactor
 
 			if ( m_events[i].events & EPOLLOUT)
 			{
-				peh->HandleOutput();
+				SyncLog::LOG(EROR, "Epoll RunReactorEventLoop epoll_wait EPOLLOUT");
+				//peh->HandleOutput();
 			}
 
 			if ( m_events[i].events & EPOLLERR || m_events[i].events & EPOLLHUP)

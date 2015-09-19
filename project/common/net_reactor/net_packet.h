@@ -2,6 +2,7 @@
 #define _NET_PACKET
 
 #include "net_share.h"
+#include "net_packet_head.h"
 
 namespace Common
 {
@@ -27,7 +28,9 @@ namespace NetReactor
 		//TODO 这个缓存是不是不够... 应该做成一个动态增长的吧...
 		char m_buff[NET_PACKET_BUFF_SIZE];
 		
-		long m_handler_id;
+		uint32_t m_handler_id;
+
+		NetPacketHead m_head;
 	};
 
 }

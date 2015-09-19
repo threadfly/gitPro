@@ -21,7 +21,7 @@ typedef struct sockaddr_in SAI;
 #define SAI struct sockaddr_in
 
 #define ListenQ 1024
-#define NET_PACKET_BUFF_SIZE 1024
+#define NET_PACKET_BUFF_SIZE 1024*4
 
 #define EPOLL_REACTOR
 #endif

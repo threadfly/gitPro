@@ -20,6 +20,7 @@ namespace Thread
 		{
 			SyncLog::LOG(EROR, "pthread_mutex_init error");
 		}
+		perror("Thread Mutex");
 	}
 	
 	Mutex::~Mutex()

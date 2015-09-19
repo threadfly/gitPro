@@ -10,6 +10,8 @@ namespace Common
 namespace NetReactor
 {
 
+using namespace Common::IPC;
+
 class SendPipe: public EventHandler
 {
 public:
@@ -21,11 +23,13 @@ public:
 
 	virtual int HandleInput();
 
-	virtual int HandleOutput();
+	virtual int HandleOutput(const void *, size_t );
 
 	virtual int HandleClose();
 	
 	int Init(int flags=0);
+
+	//int Write(const void * buff, uint32_t nbytes);
 private:
 	Pipe	m_pipe;
 };
