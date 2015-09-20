@@ -102,7 +102,7 @@ int StreamSocket::HandleInput()
 int StreamSocket::HandleOutput(const void * buff, size_t nbytes)
 {
 	SyncLog::LOG(INFO, "StreamSocket HandleOutput");
-	return 0;
+	return m_socket.Send(buff, nbytes, 0);
 }
 
 int StreamSocket::HandleClose()

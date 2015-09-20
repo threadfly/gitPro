@@ -109,7 +109,7 @@ void NetManager::Wait()
 
 int NetManager::LoadConfig()
 {
-	m_listen_ip = string("192.168.180.35");
+	m_listen_ip = string("192.168.0.108");
 
 	m_listen_port = 5888;
 

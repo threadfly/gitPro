@@ -1,3 +1,4 @@
+#include <signal.h>
 #include "net_manager.h"
 #include "sleeper.h"
 #include "net_packet.h"
@@ -23,6 +24,7 @@ int main()
 		return -1;
 	}
 	Sleeper slp(0, 120000);
+	signal(SIGPIPE, SIG_IGN);
 	while(true)
 	{
 		packet = g_net_manager.GetRecvNetPacket();

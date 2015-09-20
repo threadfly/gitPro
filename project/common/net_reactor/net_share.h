@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include "log/sync_log.h"
 

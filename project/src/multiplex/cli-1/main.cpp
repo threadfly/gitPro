@@ -32,7 +32,7 @@ int main()
 	Sleeper slp(0, 120000);
 
 	ConnectSocket client(&g_net_manager);
-	if ( -1 == client.CreateTcpClient("192.168.180.35", 5888))
+	if ( -1 == client.CreateTcpClient("192.168.0.108", 5888))
 	{
 		SyncLog::LOG(EROR, "Client Connect Error !!!");
 		return -1;
@@ -47,9 +47,9 @@ int main()
 		if ( NULL != packet )
 		{
 			std::set<uint32_t>::iterator it = ids.find(packet->m_handler_id);
-			if (it != ids.end())
+			if (it == ids.end())
 			{
-				SyncLog::LOG(EROR, "it != ids.end()");
+				SyncLog::LOG(EROR, "it == ids.end()");
 				continue;
 			}
 
