@@ -173,7 +173,7 @@ NetPacket * NetManager::GetRecvNetPacket()
 
 	return packet;
 }
-
+/*
 int NetManager::AddSendNetPacket(NetPacket * packet)
 {
 	GetMutex().Lock();
@@ -183,7 +183,7 @@ int NetManager::AddSendNetPacket(NetPacket * packet)
 	GetMutex().UnLock();
 
 	return 0;
-}
+}*/
 
 int NetManager::AddRecvNetPacket(NetPacket * packet)
 {
@@ -197,7 +197,7 @@ int NetManager::AddRecvNetPacket(NetPacket * packet)
 
 	return 0;
 }
-
+/*
 NetPacket * NetManager::GetSendNetPacket()
 {
 	NetPacket * packet = NULL;
@@ -212,8 +212,8 @@ NetPacket * NetManager::GetSendNetPacket()
 
 	GetMutex().UnLock();
 	return packet;
-}
-
+}*/
+/*
 void NetManager::SendPacketDeque()
 {
 	int limit = 50;
@@ -241,7 +241,7 @@ void NetManager::SendPacketDeque()
 		packet = GetSendNetPacket();
 	}
 
-}
+}*/
 
 uint32_t  NetManager::GenerateId()
 {

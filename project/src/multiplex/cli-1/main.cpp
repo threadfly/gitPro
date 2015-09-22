@@ -1,4 +1,5 @@
 #include <set>
+#include <signal.h>
 
 #include "net_manager.h"
 #include "sleeper.h"
@@ -27,6 +28,8 @@ int main()
 {
 	//char response[1024] = {0};
 	std::set<uint32_t> ids;
+	signal(SIGPIPE, SIG_IGN);
+
 	NetManager g_net_manager;
 	NetPacket * packet = NULL;
 	if ( -1 == g_net_manager.WorkAsClient())
@@ -39,16 +42,16 @@ int main()
 	LoadServerConfig loadConf;
 	loadConf.LoadConfig("../config/server.xml");
 
-	ConnectSocket client(&g_net_manager);
-	if ( -1 == client.CreateTcpClient(loadConf.m_server_ip , loadConf.m_server_port))
+	ConnectSocket * client = new ConnectSocket(&g_net_manager);
+	if ( -1 == client->CreateTcpClient(loadConf.m_server_ip , loadConf.m_server_port))
 	{
 		SyncLog::LOG(EROR, "Client Connect Error !!!");
 		return -1;
 	}
 
-	uint32_t clientid = client.GetId();
+	uint32_t clientid = client->GetId();
 	ids.insert(clientid);
-	g_net_manager.GetReactor()->RegisterHandler(&client);
+	g_net_manager.GetReactor()->RegisterHandler(client);
 	while(true)
 	{
 		packet = g_net_manager.GetRecvNetPacket();

@@ -54,7 +54,7 @@ namespace NetReactor
 
 		int AddRecvNetPacket(NetPacket *);
 
-		int AddSendNetPacket(NetPacket *);
+	//	int AddSendNetPacket(NetPacket *);
 		
 		Reactor * GetReactor(){ return m_reactor;}
 	
@@ -72,9 +72,9 @@ namespace NetReactor
 
 		bool SetBuffNetPacket(uint32_t, NetPacket *);
 	private:
-		NetPacket * GetSendNetPacket();
+		//NetPacket * GetSendNetPacket();
 
-		void SendPacketDeque();
+		//void SendPacketDeque();
 
 		//void WriteSendPipe(const void *, uint32_t );
 	private:
