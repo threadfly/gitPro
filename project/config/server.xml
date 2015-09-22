@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<app>
+	<server ip="192.168.180.35" port="5888"/>
+</app>
+
