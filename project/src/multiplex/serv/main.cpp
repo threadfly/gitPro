@@ -17,9 +17,18 @@ using namespace cs;
 int main()
 {
 	//char response[1024] = {0};
+	char currentdir[1024] = {0};
+	if (! getcwd(currentdir, 1024))
+	{
+		SyncLog::LOG(EROR, "getcwd error");
+		return -1;
+	}
+
+	SyncLog::LOG(INFO, "Current Dir:%s", currentdir);
+
 	NetManager g_net_manager;
 	NetPacket * packet = NULL;
-	if ( -1 == g_net_manager.Work())
+	if ( -1 == g_net_manager.Work("../config/server.xml"))
 	{
 		return -1;
 	}

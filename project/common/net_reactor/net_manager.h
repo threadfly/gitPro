@@ -38,9 +38,9 @@ namespace NetReactor
 
 		virtual void Run();
 
-		int Work();
+		int Work(const char * configfile);
 		
-		int WorkAsServer();
+		int WorkAsServer(const char * configfile);
 
 		int WorkAsClient();
 
@@ -48,7 +48,7 @@ namespace NetReactor
 		//一般用于其他线程等待此网络线程接收到客户端数据用
 		void Wait();
 
-		int LoadConfig();
+		int LoadConfig(const char * configfile);
 
 		NetPacket * GetRecvNetPacket();
 
@@ -87,7 +87,7 @@ namespace NetReactor
 		// 这里应该是从配置中加载进来的
 		string					m_listen_ip;
 		
-		int						m_listen_port;
+		uint32_t				m_listen_port;
 
 		IDGenerator				m_id_gnt;
 

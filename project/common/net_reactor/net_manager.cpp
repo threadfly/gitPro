@@ -7,6 +7,7 @@
 #include "net_stream_socket.h"
 #include "net_packet_head.h"
 #include "net_send_pipe.h"
+#include "tiny_xml/tinyxml.h"
 
 namespace Common
 {
@@ -52,10 +53,14 @@ void NetManager::Run()
 	}
 }
 
-int NetManager::Work()
+int NetManager::Work(const char * configfile)
 {
 	//1. NetManager 线程启动前的加载配置
-	LoadConfig();
+	if ( -1 == LoadConfig(configfile))
+	{
+		SyncLog::LOG(EROR, "NetManager LoadConfig Error");
+		return -1;
+	}
 	//2. 设置
 	AcceptSocket * papsk = new AcceptSocket(this);
 
@@ -107,11 +112,48 @@ void NetManager::Wait()
 	GetMutex().UnLock();
 }
 
-int NetManager::LoadConfig()
+int NetManager::LoadConfig(const char * configfile)
 {
-	m_listen_ip = string("192.168.0.108");
+	//m_listen_ip = string("192.168.0.108");
 
-	m_listen_port = 5888;
+	//m_listen_port = 5888;
+	// reference: http://www.grinninglizard.com/tinyxmldocs/tutorial0.html
+	TiXmlDocument doc(configfile);
+	if (!doc.LoadFile())
+	{
+		SyncLog::LOG(EROR, "NetManager LoadConfig Error, configfile:%s", configfile);
+		return -1;
+	}
+
+	TiXmlHandle hDoc(&doc);
+	TiXmlElement* pElem;
+	TiXmlHandle hRoot(0);
+
+	pElem = hDoc.FirstChildElement().Element();
+	if (!pElem)
+	{
+		SyncLog::LOG(EROR, "NetManager LoadConfig FirstChildElement Error, pElem:NULL");
+		return -1;
+	}
+
+	hRoot = TiXmlHandle(pElem);
+
+	pElem = hRoot.FirstChild("server").Element();
+	if (pElem)
+	{
+		m_listen_ip = pElem->Attribute("ip");
+		pElem->QueryUnsignedAttribute("port", &m_listen_port);
+	}
+	else
+	{
+		SyncLog::LOG(EROR, "NetManage LoadConfig FirstChld Error, pElem:NULL");
+		return -1;
+	}
+	/*for ( pElem; pElem != NULL ; pElem=pElem->NextSiblingElement())
+	{
+		const char * pKey = pElem->Value();
+		SyncLog::LOG(INFO, "NetManager LoadConfig, pKey:%s", pKey);
+	}*/
 
 	return 0;
 }
@@ -266,9 +308,9 @@ void NetManager::SendMessage(InnerPacketHead &head,const void * message)
 	//WriteSendPipe(message, length);
 }
 
-int NetManager::WorkAsServer()
+int NetManager::WorkAsServer(const char * configfile)
 {
-	return Work();
+	return Work(configfile);
 }
 
 int NetManager::WorkAsClient()

@@ -14,13 +14,19 @@ namespace Thread
 		{
 			SyncLog::LOG(EROR, "pthread_mutexattr_settype error | ret:%d", ret);
 		}*/
+		int ret = pthread_mutexattr_init(&m_attr);
+		if ( 0 != ret )
+		{
+			SyncLog::LOG(EROR, "pthread_mutexattr_init error | ret:%d", ret);
+			perror("Thread MutexAttr");
+		}
 
-		int ret = ::pthread_mutex_init(&m_mutex, &m_attr);
+		ret = ::pthread_mutex_init(&m_mutex, &m_attr);
 		if ( 0 != ret )
 		{
 			SyncLog::LOG(EROR, "pthread_mutex_init error");
+			perror("Thread Mutex");
 		}
-		perror("Thread Mutex");
 	}
 	
 	Mutex::~Mutex()
@@ -30,6 +36,12 @@ namespace Thread
 		{
 			//perror("~Mutex mutex destroy error");
 			SyncLog::LOG(EROR, "~Mutex mutex destroy error | ret:%d", ret);
+		}
+
+		ret = ::pthread_mutexattr_destroy(&m_attr);
+		if ( 0 != ret )
+		{
+			SyncLog::LOG(EROR, "pthread_mutexattr_destroy error");
 		}
 	}
 

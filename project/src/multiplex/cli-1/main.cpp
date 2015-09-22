@@ -1,10 +1,15 @@
 #include <set>
+
 #include "net_manager.h"
 #include "sleeper.h"
 #include "net_packet.h"
 #include "net_connect_socket.h"
 #include "net_reactor.h"
 #include "sync_log.h"
+
+// current dir
+#include "config.h"
+
 #include "cmd.pb.h"
 #include "cs.pb.h"
 
@@ -29,10 +34,13 @@ int main()
 		return -1;
 	}
 
-	Sleeper slp(0, 120000);
+	Sleeper slp(0, 20000);
+
+	LoadServerConfig loadConf;
+	loadConf.LoadConfig("../config/server.xml");
 
 	ConnectSocket client(&g_net_manager);
-	if ( -1 == client.CreateTcpClient("192.168.0.108", 5888))
+	if ( -1 == client.CreateTcpClient(loadConf.m_server_ip , loadConf.m_server_port))
 	{
 		SyncLog::LOG(EROR, "Client Connect Error !!!");
 		return -1;
@@ -90,7 +98,7 @@ int main()
 
 			SyncLog::LOG(INFO, "Client Req id:%d name:%s hid:%d cmd:%d", c2s_login.id(), c2s_login.name().c_str(), clientid, ID_C2S_Login);
 
-		//	slp.Start();
+			//slp.Start();
 		}
 
 	}
