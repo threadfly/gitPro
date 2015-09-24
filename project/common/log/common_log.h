@@ -5,6 +5,7 @@
 #include <string.h>
 #include <iostream>
 
+#include <sys/time.h>
 using namespace std;
 
 namespace Common

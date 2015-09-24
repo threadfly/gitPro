@@ -11,7 +11,7 @@ namespace Log
 		if ( NULL == Formate)
 			return;
 
-		char log[1000] = {0};
+		char log[1024] = {0};
 		int index = 0;
 		switch(level)
 		{
@@ -23,16 +23,21 @@ namespace Log
 			case INFO:
 				//std::cout<<"[INFO] "<< info<<std::endl;
 				//str += "[INFO] ";
-				index = sprintf(log, "[INFO] ");
+				index = sprintf(log, "[INFO]  ");
 				break;
 			case EROR:
 				//perror((string("[EROR] ")+ info).c_str());
 				//str += "[EROR] ";
-				index = sprintf(log, "[EROR] ");
+				index = sprintf(log, "[EROR]  ");
 				break;
 			default:
 				break;
 		}
+
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		index += strftime(log+index, sizeof(log), " %F %T ", localtime(&tv.tv_sec));
+	//	index += vsprintf(log+index, " %s:%d", file, line);
 
 		va_list args ;
 		va_start(args, Formate);
