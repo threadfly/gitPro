@@ -1,0 +1,58 @@
+#include "sync_log.h"
+
+namespace Common
+{
+
+namespace Log
+{
+	
+	void SyncLog::LOG(LEVEL level, const char * file, int line, const char * Formate, ...)
+	{
+		if ( NULL == Formate)
+			return;
+
+		char log[1024] = {0};
+		int index = 0;
+		switch(level)
+		{
+			case DEBUG:
+				//std::cout<<"[DEBUG] "<< info << std::endl;
+				//str += "[DEBUG] ";
+				index = sprintf(log, "[DEBUG] ");
+				break;
+			case INFO:
+				//std::cout<<"[INFO] "<< info<<std::endl;
+				//str += "[INFO] ";
+				index = sprintf(log, "[INFO]  ");
+				break;
+			case EROR:
+				//perror((string("[EROR] ")+ info).c_str());
+				//str += "[EROR] ";
+				index = sprintf(log, "[EROR]  ");
+				break;
+			default:
+				break;
+		}
+
+		struct timeval tv;
+		//struct tm *t = NULL;
+		//t = localtime(&tv.tv_sec);
+		gettimeofday(&tv, NULL);
+		//index += strftime(log+index, sizeof(log), " %4d-%02d-%02d %02d:%02d:%02d ", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+		index += strftime(log+index, sizeof(log), " %F %T ", localtime(&tv.tv_sec));
+
+		index += vsprintf(log+index, " %s:%d", file, line);
+
+		va_list args ;
+		va_start(args, Formate);
+		vsprintf(log+index, Formate, args);
+		va_end(args);
+
+		std::cout << log << std::endl;
+	}
+}
+
+
+}
+
+
