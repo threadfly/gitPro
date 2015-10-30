@@ -24,6 +24,7 @@ namespace NetReactor
 	class EventHandler;
 	class InnerPacketHead;
 	class SendPipe;
+	class LinuxEventFd;
 
 	class NetManager:public Common::Thread::Thread
 	{
@@ -54,7 +55,7 @@ namespace NetReactor
 
 		int AddRecvNetPacket(NetPacket *);
 
-	//	int AddSendNetPacket(NetPacket *);
+		int AddSendNetPacket(NetPacket *);
 		
 		Reactor * GetReactor(){ return m_reactor;}
 	
@@ -71,6 +72,11 @@ namespace NetReactor
 		NetPacket * GetBuffNetPacket(uint32_t);
 
 		bool SetBuffNetPacket(uint32_t, NetPacket *);
+
+	public:
+		int SendMessageByEvtFd( NetPacket *);
+
+		NetPacket * GetSendNetPacket();
 	private:
 		//NetPacket * GetSendNetPacket();
 
@@ -100,6 +106,9 @@ namespace NetReactor
 		bool					m_stop;
 
 		SendPipe *				m_send_pipe;
+		
+		// 通知写事件 TODO 以后指针尝试用智能指针替换
+		LinuxEventFd *			m_wfd;
 	};
 }
 

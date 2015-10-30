@@ -33,6 +33,12 @@ int NetPacket::Read(void * buff, int len)
 	return len;
 }
 
+int NetPacket::Clear()
+{
+	::memset(m_buff, 0, NET_PACKET_BUFF_SIZE);
+	return 0;
+}
+
 }
 
 }

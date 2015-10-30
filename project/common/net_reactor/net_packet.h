@@ -22,7 +22,8 @@ namespace NetReactor
 		int Write(const void * src, int len);
 
 		int Read(void * buff, int len);
-	
+		
+		int Clear();
 	public:
 		int  m_buff_len;
 		//TODO 这个缓存是不是不够... 应该做成一个动态增长的吧...

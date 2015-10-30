@@ -8,6 +8,7 @@
 #include "net_packet_head.h"
 #include "net_send_pipe.h"
 #include "tiny_xml/tinyxml.h"
+#include "net_eventfd.h"
 
 namespace Common
 {
@@ -94,6 +95,20 @@ int NetManager::Work(const char * configfile)
 		SyncLog::LOG(EROR, "NetManager Work m_send_pipe RegisterHandler Error");
 		return -1;
 	}
+	// 注册eventfd 用来通知写事件 //TODO 以后放到一个函数中
+	m_wfd = new LinuxEventFd(this);
+	ret = m_wfd->Init();
+	if (-1 == ret)
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_wfd Init Error");
+		return -1;
+	}
+
+	if ( -1 == m_reactor->RegisterHandler(m_wfd))
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_wfd RegisterHandler Error");
+		return -1;
+	}
 	//5. 启动NetManager线程
 	if (0 != Start())
 		return -1;
@@ -173,7 +188,7 @@ NetPacket * NetManager::GetRecvNetPacket()
 
 	return packet;
 }
-/*
+
 int NetManager::AddSendNetPacket(NetPacket * packet)
 {
 	GetMutex().Lock();
@@ -183,7 +198,7 @@ int NetManager::AddSendNetPacket(NetPacket * packet)
 	GetMutex().UnLock();
 
 	return 0;
-}*/
+}
 
 int NetManager::AddRecvNetPacket(NetPacket * packet)
 {
@@ -197,7 +212,7 @@ int NetManager::AddRecvNetPacket(NetPacket * packet)
 
 	return 0;
 }
-/*
+
 NetPacket * NetManager::GetSendNetPacket()
 {
 	NetPacket * packet = NULL;
@@ -212,7 +227,7 @@ NetPacket * NetManager::GetSendNetPacket()
 
 	GetMutex().UnLock();
 	return packet;
-}*/
+}
 /*
 void NetManager::SendPacketDeque()
 {
@@ -329,11 +344,41 @@ int NetManager::WorkAsClient()
 		SyncLog::LOG(EROR, "NetManager Work m_send_pipe RegisterHandler Error");
 		return -1;
 	}
+	// 注册eventfd 用来通知写事件
+	m_wfd = new LinuxEventFd(this);
+	ret = m_wfd->Init();
+	if (-1 == ret)
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_wfd Init Error");
+		return -1;
+	}
+
+	if ( -1 == m_reactor->RegisterHandler(m_wfd))
+	{
+		SyncLog::LOG(EROR, "NetManager Work m_wfd RegisterHandler Error");
+		return -1;
+	}
+
 	//5. 启动NetManager线程
 	if (0 != Start())
 		return -1;
 	//6. ......
 	
+	return 0;
+}
+
+int NetManager::SendMessageByEvtFd(NetPacket * packet)
+{
+	if (packet == NULL )
+	{
+		SyncLog::LOG(EROR, "SendMessageByEvtFd packet is NULL");
+		return -1;
+	}
+
+	AddSendNetPacket(packet);
+
+	m_wfd->Signal();
+
 	return 0;
 }
 

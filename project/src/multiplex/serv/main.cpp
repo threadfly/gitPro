@@ -50,7 +50,7 @@ int main()
 					
 					S2C_Login s2c_login;
 					s2c_login.set_ret(RET_SUCCESS);
-					string ret;
+					/*string ret;
 					s2c_login.SerializeToString(&ret);
 					
 					InnerPacketHead ihead;
@@ -62,7 +62,13 @@ int main()
 
 					g_net_manager.SendMessage(ihead, ret.c_str());
 					delete packet;
-					packet = NULL;
+					packet = NULL;*/
+					packet->Clear();
+					packet->m_head.length = s2c_login.ByteSize();
+					packet->m_head.cmd = ID_S2C_Login;
+					s2c_login.SerializeToArray((void *)packet->m_buff, NET_PACKET_BUFF_SIZE );
+					g_net_manager.SendMessageByEvtFd(packet);
+
 				}
 					break;
 				default:
