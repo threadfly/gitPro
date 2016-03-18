@@ -18,6 +18,8 @@ namespace Base
 				static T instance;
 				return &instance;
 			}
+
+		private
 	};
 
 
