@@ -35,7 +35,8 @@ class SingletonLazyStrengthen{
 		}
 };
 
-SingletonLazyStrengthen * SingletonLazyStrengthen::m_instance;
+SingletonLazyStrengthen * SingletonLazyStrengthen::m_instance = new SingletonLazyStrengthen;
+//SingletonLazyStrengthen * SingletonLazyStrengthen::m_instance;  // hungry model
 
 int main(){
 	cout << (SingletonLazyStrengthen::getPoint() == nullptr) << endl;
