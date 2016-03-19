@@ -16,7 +16,7 @@ class NonCopyable {
 		/*
 		 * 禁用拷贝构造函数
 		 */
-		NonCopyable(const NonCopyable &){}
+		NonCopyable(const NonCopyable &);//{}
 
 		/*
 		 * 禁用赋值构造函数
